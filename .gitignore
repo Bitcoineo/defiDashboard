@@ -24,3 +24,6 @@ Thumbs.db
 
 # Claude Code
 .claude/
+
+# Local settings
+settings_local.json

@@ -255,8 +255,8 @@ class Handler(BaseHTTPRequestHandler):
 # ---------------------------------------------------------------------------
 
 def main():
-    server = ThreadingHTTPServer(("", PORT), Handler)
-    print(f"DeFi Dashboard running → http://localhost:{PORT}")
+    server = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
+    print(f"DeFi Dashboard running → http://0.0.0.0:{PORT}")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
