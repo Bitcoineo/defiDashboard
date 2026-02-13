@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:api.llama.fi)",
+      "WebFetch(domain:yields.llama.fi)",
+      "WebFetch(domain:defillama.com)",
+      "WebSearch",
+      "WebFetch(domain:api-docs.defillama.com)",
+      "Bash(python3:*)",
+      "Bash(lsof:*)",
+      "Bash(curl:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(open:*)",
+      "Bash(xargs kill:*)"
+    ]
+  }
+}

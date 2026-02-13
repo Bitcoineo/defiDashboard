@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeFi Dashboard</title>
+<script>
+(function(){
+  var t=localStorage.getItem("defi-theme")||
+    (matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light");
+  document.documentElement.setAttribute("data-theme",t);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ================================================================
+   DESIGN SYSTEM
+   ================================================================ */
+:root {
+  --bg-gradient: linear-gradient(135deg, #e8eaf6 0%, #f3e5f5 40%, #e3f2fd 100%);
+  --glass: rgba(255,255,255,0.55);
+  --glass-hover: rgba(255,255,255,0.75);
+  --glass-strong: rgba(255,255,255,0.82);
+  --glass-border: rgba(255,255,255,0.5);
+  --blur: 20px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.06);
+  --shadow-hover: 0 12px 40px rgba(0,0,0,0.1);
+  --accent: #6366f1;
+  --accent-light: #818cf8;
+  --accent-bg: rgba(99,102,241,0.08);
+  --accent-bg-solid: #eef2ff;
+  --green: #10b981;
+  --red: #ef4444;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --text-dim: #94a3b8;
+  --border: rgba(0,0,0,0.06);
+  --radius-lg: 16px;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-pill: 24px;
+
+  /* Theme-bridged component colors */
+  --tab-hover-bg: rgba(0,0,0,0.04);
+  --card-rank-bg: rgba(0,0,0,0.04);
+  --card-logo-bg: white;
+  --table-th-bg: rgba(255,255,255,0.5);
+  --table-td-border: rgba(0,0,0,0.04);
+  --table-row-hover: rgba(99,102,241,0.03);
+  --modal-overlay-bg: rgba(15,23,42,0.3);
+  --modal-panel-bg: white;
+  --modal-close-hover-bg: rgba(0,0,0,0.05);
+  --detail-logo-bg: white;
+  --stat-box-bg: rgba(255,255,255,0.5);
+  --range-btn-bg: rgba(255,255,255,0.5);
+  --chart-wrap-bg: rgba(255,255,255,0.4);
+  --skeleton-c1: rgba(255,255,255,0.3);
+  --skeleton-c2: rgba(255,255,255,0.6);
+  --stable-badge-bg: rgba(16,185,129,0.1);
+
+  /* JS-readable chart colors */
+  --chart-stroke: #6366f1;
+  --chart-fill-start: rgba(99,102,241,0.18);
+  --chart-fill-end: rgba(99,102,241,0.02);
+  --chart-grid: rgba(0,0,0,0.06);
+  --chart-label: #94a3b8;
+  --chart-dot-stroke: white;
+  --chart-crosshair: rgba(99,102,241,0.3);
+  --tooltip-bg: rgba(30,41,59,0.92);
+  --tooltip-text: white;
+  --tooltip-date: rgba(255,255,255,0.6);
+  --sparkline-green: 16,185,129;
+  --sparkline-red: 239,68,68;
+}
+
+[data-theme="dark"] {
+  --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1a1033 40%, #0c1929 100%);
+  --glass: rgba(30,41,59,0.55);
+  --glass-hover: rgba(30,41,59,0.75);
+  --glass-strong: rgba(30,41,59,0.82);
+  --glass-border: rgba(255,255,255,0.08);
+  --shadow: 0 8px 32px rgba(0,0,0,0.25);
+  --shadow-hover: 0 12px 40px rgba(0,0,0,0.35);
+  --accent: #818cf8;
+  --accent-light: #a5b4fc;
+  --accent-bg: rgba(129,140,248,0.12);
+  --accent-bg-solid: #1e1b4b;
+  --green: #34d399;
+  --red: #f87171;
+  --text: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-dim: #64748b;
+  --border: rgba(255,255,255,0.06);
+
+  --tab-hover-bg: rgba(255,255,255,0.06);
+  --card-rank-bg: rgba(255,255,255,0.06);
+  --card-logo-bg: rgba(30,41,59,0.8);
+  --table-th-bg: rgba(30,41,59,0.7);
+  --table-td-border: rgba(255,255,255,0.04);
+  --table-row-hover: rgba(129,140,248,0.06);
+  --modal-overlay-bg: rgba(0,0,0,0.5);
+  --modal-panel-bg: #1e293b;
+  --modal-close-hover-bg: rgba(255,255,255,0.08);
+  --detail-logo-bg: rgba(30,41,59,0.8);
+  --stat-box-bg: rgba(255,255,255,0.05);
+  --range-btn-bg: rgba(255,255,255,0.05);
+  --chart-wrap-bg: rgba(255,255,255,0.04);
+  --skeleton-c1: rgba(255,255,255,0.04);
+  --skeleton-c2: rgba(255,255,255,0.08);
+  --stable-badge-bg: rgba(52,211,153,0.12);
+
+  --chart-stroke: #818cf8;
+  --chart-fill-start: rgba(129,140,248,0.18);
+  --chart-fill-end: rgba(129,140,248,0.02);
+  --chart-grid: rgba(255,255,255,0.06);
+  --chart-label: #64748b;
+  --chart-dot-stroke: #1e293b;
+  --chart-crosshair: rgba(129,140,248,0.3);
+  --tooltip-bg: rgba(15,23,42,0.95);
+  --tooltip-text: #e2e8f0;
+  --tooltip-date: rgba(226,232,240,0.6);
+  --sparkline-green: 52,211,153;
+  --sparkline-red: 248,113,113;
+}
+
+/* ================================================================
+   RESET & BASE
+   ================================================================ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+body {
+  background: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none }
+a:hover { color: var(--accent-light) }
+
+/* Theme transition */
+body, .protocol-card, .table-glass, .search-input, nav, .tab-btn,
+.modal-panel, .stat-box, .range-btn, .chart-wrap, .badge, .card-rank,
+.logo-icon, .theme-toggle, .tvl-summary {
+  transition: background 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+/* ================================================================
+   LAYOUT
+   ================================================================ */
+#app { max-width: 1200px; margin: 0 auto; padding: 32px 28px 60px }
+
+header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; color: inherit; cursor: pointer;
+}
+.logo:hover { color: inherit; text-decoration: none }
+.logo:hover .logo-icon {
+  transform: scale(1.05);
+  box-shadow: 0 2px 12px rgba(99,102,241,0.3);
+}
+.logo-icon {
+  width: 32px; height: 32px; border-radius: var(--radius-sm);
+  background: var(--accent); display: flex; align-items: center;
+  justify-content: center; color: white; font-weight: 700; font-size: 16px;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+}
+.logo h1 {
+  font-size: 20px; font-weight: 700; color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.header-right { display: flex; align-items: center; gap: 12px; justify-content: flex-end }
+
+/* ================================================================
+   THEME TOGGLE
+   ================================================================ */
+.theme-toggle {
+  background: var(--glass);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-pill);
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: var(--glass-hover);
+  color: var(--text);
+}
+.theme-toggle svg { width: 18px; height: 18px }
+
+/* ================================================================
+   TABS
+   ================================================================ */
+nav {
+  display: flex; gap: 6px;
+  background: var(--glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border); border-radius: var(--radius-pill);
+  padding: 4px;
+}
+.tab-btn {
+  background: transparent; border: none; color: var(--text-secondary);
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  padding: 8px 20px; cursor: pointer;
+  border-radius: 20px; transition: all 0.2s;
+}
+.tab-btn:hover { color: var(--text); background: var(--tab-hover-bg) }
+.tab-btn.active {
+  color: white; background: var(--accent);
+  box-shadow: 0 2px 8px rgba(99,102,241,0.3);
+}
+.tab-content { display: none }
+.tab-content.active { display: block }
+
+/* ================================================================
+   SEARCH
+   ================================================================ */
+.search-container { position: relative; margin-bottom: 24px }
+.search-input {
+  width: 100%; padding: 12px 40px 12px 16px;
+  background: var(--glass); backdrop-filter: blur(var(--blur)); -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--glass-border); border-radius: var(--radius);
+  color: var(--text); font-family: inherit; font-size: 14px;
+  transition: all 0.2s;
+}
+.search-input:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+  background: var(--glass-strong);
+}
+.search-input::placeholder { color: var(--text-dim) }
+.search-clear {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: var(--text-dim); font-size: 18px;
+  cursor: pointer; line-height: 1; transition: color 0.15s; font-family: inherit;
+}
+.search-clear:hover { color: var(--red) }
+.hidden { display: none }
+
+/* ================================================================
+   TVL SUMMARY BAR
+   ================================================================ */
+.tvl-summary {
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur)); -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  box-shadow: var(--shadow);
+}
+.tvl-summary-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.tvl-summary-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+.tvl-summary-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+.tvl-summary-change {
+  font-size: 14px;
+  font-weight: 600;
+}
+.tvl-summary-change.pos { color: var(--green) }
+.tvl-summary-change.neg { color: var(--red) }
+.tvl-summary-chart {
+  flex: 1;
+  min-width: 0;
+}
+.tvl-summary-canvas {
+  display: block;
+  width: 100%;
+  height: 48px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tvl-summary-canvas.loaded { opacity: 1 }
+.tvl-summary.loading { min-height: 96px }
+.tvl-summary .skel-text { height: 14px; width: 80px; border-radius: 4px; margin-bottom: 6px }
+.tvl-summary .skel-value { height: 28px; width: 160px; border-radius: 6px; margin-bottom: 6px }
+.tvl-summary .skel-change { height: 14px; width: 90px; border-radius: 4px }
+.tvl-summary .skel-canvas { flex: 1; height: 48px; border-radius: var(--radius-sm) }
+
+/* ================================================================
+   PROTOCOL CARDS
+   ================================================================ */
+.protocol-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.protocol-card {
+  background: var(--glass);
+  backdrop-filter: blur(var(--blur)); -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.protocol-card:hover {
+  background: var(--glass-hover);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(99,102,241,0.2);
+}
+.card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px }
+.card-logo {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: var(--card-logo-bg); object-fit: contain; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.card-name {
+  font-size: 15px; font-weight: 600; color: var(--text);
+  flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.card-rank {
+  font-size: 11px; color: var(--text-dim); font-weight: 500;
+  background: var(--card-rank-bg); padding: 2px 8px; border-radius: 6px;
+}
+.card-body { display: flex; flex-direction: column; gap: 8px }
+.card-tvl { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.5px }
+.card-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap }
+.card-change { font-size: 13px; font-weight: 600 }
+.card-change.pos { color: var(--green) }
+.card-change.neg { color: var(--red) }
+.badge {
+  font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: 500;
+  background: var(--accent-bg); color: var(--accent);
+}
+.chain-pill { font-size: 12px; color: var(--text-dim) }
+
+/* SPARKLINE */
+.card-sparkline { display: block; width: 100%; height: 32px; margin: 4px 0; opacity: 0; transition: opacity 0.3s }
+.card-sparkline.loaded { opacity: 1 }
+
+/* ================================================================
+   TABLES
+   ================================================================ */
+.table-glass {
+  background: var(--glass); backdrop-filter: blur(var(--blur)); -webkit-backdrop-filter: blur(var(--blur));
+  border: 1px solid var(--glass-border); border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px }
+.data-table thead { position: sticky; top: 0; z-index: 2 }
+.data-table th {
+  text-align: left; padding: 14px 16px; color: var(--text-secondary); font-weight: 600;
+  border-bottom: 1px solid var(--border); background: var(--table-th-bg);
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.3px;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.data-table th.sortable { cursor: pointer; user-select: none }
+.data-table th.sortable:hover { color: var(--accent) }
+.data-table th .sort-arrow { margin-left: 4px; font-size: 10px }
+.data-table td { padding: 12px 16px; border-bottom: 1px solid var(--table-td-border) }
+.data-table tbody tr { transition: background 0.15s }
+.data-table tbody tr:hover { background: var(--table-row-hover) }
+
+.tvl-bar-cell { width: 22%; position: relative }
+.tvl-bar {
+  height: 6px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent-light), var(--accent));
+  opacity: 0.5; transition: width 0.3s;
+}
+.stable-badge {
+  font-size: 10px; padding: 2px 7px; border-radius: 6px; font-weight: 500;
+  background: var(--stable-badge-bg); color: var(--green);
+}
+.apy-cell { font-weight: 600 }
+
+/* ================================================================
+   MODAL
+   ================================================================ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: var(--modal-overlay-bg); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  overflow-y: auto; justify-content: center; padding: 48px 20px;
+}
+.modal-overlay.open { display: flex }
+.modal-panel {
+  background: var(--modal-panel-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg); width: 100%; max-width: 720px;
+  padding: 32px; position: relative; align-self: flex-start;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.12);
+  animation: modalIn 0.25s ease;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98) }
+  to { opacity: 1; transform: translateY(0) scale(1) }
+}
+.modal-close {
+  position: absolute; top: 16px; right: 18px; background: none; border: none;
+  color: var(--text-dim); font-size: 24px; cursor: pointer; font-family: inherit;
+  line-height: 1; width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.modal-close:hover { background: var(--modal-close-hover-bg); color: var(--text) }
+
+.detail-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px }
+.detail-logo {
+  width: 48px; height: 48px; border-radius: 12px; object-fit: contain;
+  background: var(--detail-logo-bg); box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.detail-title { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.3px }
+.detail-category { margin-left: 4px }
+
+.detail-desc { color: var(--text-secondary); font-size: 14px; line-height: 1.7; margin-bottom: 24px }
+
+.detail-stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap }
+.stat-box {
+  background: var(--stat-box-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px; flex: 1; min-width: 140px;
+}
+.stat-label {
+  font-size: 11px; color: var(--text-dim); text-transform: uppercase;
+  letter-spacing: 0.5px; font-weight: 500; margin-bottom: 4px;
+}
+.stat-value { font-size: 22px; font-weight: 700; color: var(--text) }
+
+.chart-section { margin-bottom: 24px }
+.chart-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+}
+.chart-header h3 {
+  font-size: 13px; color: var(--text-secondary); text-transform: uppercase;
+  letter-spacing: 0.3px; font-weight: 600; margin: 0;
+}
+.chart-range-btns { display: flex; gap: 4px }
+.range-btn {
+  background: var(--range-btn-bg); border: 1px solid var(--border);
+  color: var(--text-dim); font-family: inherit; font-size: 11px; font-weight: 500;
+  padding: 4px 12px; cursor: pointer; border-radius: 6px; transition: all 0.15s;
+}
+.range-btn:hover { border-color: var(--accent); color: var(--accent) }
+.range-btn.active { border-color: var(--accent); color: white; background: var(--accent) }
+.chart-wrap {
+  background: var(--chart-wrap-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px; position: relative;
+}
+.chart-wrap canvas { width: 100%; height: 200px; display: block; cursor: crosshair }
+.chart-tooltip {
+  position: absolute; display: none;
+  background: var(--tooltip-bg); color: var(--tooltip-text);
+  border-radius: 8px; padding: 8px 12px;
+  pointer-events: none; font-size: 12px; white-space: nowrap; z-index: 10;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.chart-tooltip.visible { display: block }
+.tooltip-date { color: var(--tooltip-date); margin-bottom: 2px; font-size: 11px }
+.tooltip-value { color: var(--tooltip-text); font-weight: 600; font-size: 14px }
+
+.chain-breakdown { margin-bottom: 24px }
+.chain-breakdown h3 {
+  font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;
+  text-transform: uppercase; letter-spacing: 0.3px; font-weight: 600;
+}
+.chain-row {
+  display: flex; justify-content: space-between; padding: 10px 0;
+  border-bottom: 1px solid var(--table-td-border); font-size: 13px;
+}
+.chain-row span:first-child { font-weight: 500 }
+.chain-row span:last-child { font-weight: 600 }
+
+.detail-links { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px }
+.detail-link {
+  padding: 8px 16px; border-radius: var(--radius); font-size: 13px; font-weight: 500;
+  background: var(--accent-bg); color: var(--accent); transition: background 0.15s;
+}
+.detail-link:hover { background: var(--accent-bg-solid); color: var(--accent) }
+
+/* ================================================================
+   SKELETONS
+   ================================================================ */
+@keyframes shimmer {
+  0% { background-position: -400px 0 }
+  100% { background-position: 400px 0 }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--skeleton-c1) 25%, var(--skeleton-c2) 50%, var(--skeleton-c1) 75%);
+  background-size: 800px 100%; animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-lg);
+}
+.skel-card {
+  height: 200px; border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+.skel-row { height: 48px; margin-bottom: 4px; border-radius: var(--radius-sm) }
+
+/* ================================================================
+   UTILITIES
+   ================================================================ */
+.error-msg { color: var(--red); padding: 32px; text-align: center; font-size: 14px }
+.empty-msg { color: var(--text-dim); padding: 32px; text-align: center }
+
+/* ================================================================
+   RESPONSIVE
+   ================================================================ */
+@media (max-width: 960px) {
+  .protocol-grid { grid-template-columns: repeat(2, 1fr) }
+}
+@media (max-width: 640px) {
+  #app { padding: 16px 16px 40px }
+  header { grid-template-columns: 1fr 1fr; grid-template-rows: auto auto }
+  header nav { grid-column: 1 / -1; justify-self: center; order: 1 }
+  .header-right { order: 0 }
+  .protocol-grid { grid-template-columns: 1fr }
+  .tvl-summary { flex-direction: column; align-items: stretch; gap: 16px; padding: 20px }
+  .tvl-summary-canvas { height: 40px }
+  .detail-stats { flex-direction: column }
+  .data-table { font-size: 12px }
+  .data-table th, .data-table td { padding: 8px 10px }
+  .modal-panel { padding: 20px }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <a href="#" class="logo" id="logo-home" aria-label="Home">
+      <div class="logo-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+          <polyline points="2 17 12 22 22 17"/>
+          <polyline points="2 12 12 17 22 12"/>
+        </svg>
+      </div>
+      <h1>DeFi Dashboard</h1>
+    </a>
+    <nav>
+      <button class="tab-btn active" data-tab="protocols">Protocols</button>
+      <button class="tab-btn" data-tab="chains">Chains</button>
+      <button class="tab-btn" data-tab="yields">Yields</button>
+    </nav>
+    <div class="header-right">
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.95l-.71.71M21 12h-1M4 12H3m16.66 7.66l-.71-.71M4.05 4.05l-.71-.71M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="2" stroke="currentColor" style="display:none">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21.752 15.002A9.718 9.718 0 0112.003 21c-5.385 0-9.75-4.365-9.75-9.75 0-4.128 2.572-7.659 6.201-9.082a.75.75 0 01.964.964 7.5 7.5 0 0010.334 10.334.75.75 0 01.964.964z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div id="protocols-tab" class="tab-content active">
+      <div class="search-container">
+        <input type="text" id="protocol-search" class="search-input"
+               placeholder="Search protocols..." autocomplete="off">
+        <button id="search-clear" class="search-clear hidden">&times;</button>
+      </div>
+      <div id="tvl-summary" class="tvl-summary loading">
+        <div class="tvl-summary-stats">
+          <div class="skel-text skeleton"></div>
+          <div class="skel-value skeleton"></div>
+          <div class="skel-change skeleton"></div>
+        </div>
+        <div class="tvl-summary-chart">
+          <div class="skel-canvas skeleton"></div>
+        </div>
+      </div>
+      <div id="protocol-grid" class="protocol-grid"></div>
+    </div>
+    <div id="chains-tab" class="tab-content">
+      <div id="chains-container"></div>
+    </div>
+    <div id="yields-tab" class="tab-content">
+      <div id="yields-container"></div>
+    </div>
+  </main>
+</div>
+
+<div id="detail-modal" class="modal-overlay">
+  <div class="modal-panel">
+    <button class="modal-close" id="modal-close">&times;</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ==================================================================
+   STATE
+   ================================================================== */
+const state = {
+  protocols: null,
+  chains: null,
+  yields: null,
+  tvlHistory: null,
+  sortCol: "tvlUsd",
+  sortDir: "desc",
+  loaded: {},
+  searchQuery: ""
+};
+
+/* ==================================================================
+   THEME
+   ================================================================== */
+const themeToggle = document.getElementById("theme-toggle");
+const iconSun = themeToggle.querySelector(".icon-sun");
+const iconMoon = themeToggle.querySelector(".icon-moon");
+
+function getSystemTheme() {
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  const isDark = theme === "dark";
+  iconSun.style.display = isDark ? "none" : "block";
+  iconMoon.style.display = isDark ? "block" : "none";
+}
+
+// Initialize: stored preference > system preference
+const storedTheme = localStorage.getItem("defi-theme");
+applyTheme(storedTheme || getSystemTheme());
+
+themeToggle.addEventListener("click", () => {
+  const current = document.documentElement.getAttribute("data-theme") || "light";
+  const next = current === "dark" ? "light" : "dark";
+  applyTheme(next);
+  localStorage.setItem("defi-theme", next);
+  // Redraw sparklines with new theme colors
+  document.querySelectorAll(".card-sparkline.loaded").forEach(c => {
+    c.classList.remove("loaded");
+  });
+  loadSparklines();
+  drawTvlSummarySparkline();
+  // Redraw chart if visible
+  const activeRange = document.querySelector(".range-btn.active");
+  if (activeRange) activeRange.click();
+});
+
+// Listen for system theme changes (when no stored preference)
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", e => {
+  if (!localStorage.getItem("defi-theme")) {
+    applyTheme(e.matches ? "dark" : "light");
+  }
+});
+
+/* ==================================================================
+   UTILS
+   ================================================================== */
+function fmt(n){
+  if(n==null||isNaN(n)) return "\u2014";
+  const a=Math.abs(n);
+  if(a>=1e12) return "$"+(n/1e12).toFixed(2)+"T";
+  if(a>=1e9)  return "$"+(n/1e9).toFixed(2)+"B";
+  if(a>=1e6)  return "$"+(n/1e6).toFixed(2)+"M";
+  if(a>=1e3)  return "$"+(n/1e3).toFixed(1)+"K";
+  return "$"+n.toFixed(0);
+}
+function pct(n){
+  if(n==null||isNaN(n)) return "\u2014";
+  const sign=n>=0?"+":"";
+  return sign+n.toFixed(2)+"%";
+}
+function pctClass(n){return n>=0?"pos":"neg"}
+function apyColor(a){
+  if(a>=30) return "var(--accent)";
+  if(a>=10) return "var(--accent-light)";
+  return "var(--text-dim)";
+}
+function esc(s){
+  const d=document.createElement("div");d.textContent=s||"";return d.innerHTML;
+}
+const FALLBACK_LOGO="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Crect width='36' height='36' rx='10' fill='%23f1f5f9'/%3E%3Ctext x='18' y='22' text-anchor='middle' fill='%2394a3b8' font-size='14' font-family='sans-serif'%3E%3F%3C/text%3E%3C/svg%3E";
+
+/* ==================================================================
+   API
+   ================================================================== */
+async function api(path){
+  const r=await fetch(path);
+  if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+  return r.json();
+}
+
+/* ==================================================================
+   SKELETON HELPERS
+   ================================================================== */
+function skelCards(n){
+  return Array(n).fill('<div class="skel-card skeleton"></div>').join("");
+}
+function skelRows(n){
+  return Array(n).fill('<div class="skel-row skeleton"></div>').join("");
+}
+
+/* ==================================================================
+   PROTOCOLS TAB
+   ================================================================== */
+async function renderProtocols(){
+  renderTvlSummary();
+  const grid=document.getElementById("protocol-grid");
+  if(state.protocols){applySearch();return}
+  grid.innerHTML=skelCards(9);
+  try{
+    const data=await api("/api/protocols");
+    state.protocols=data;
+    applySearch();
+  }catch(e){
+    grid.innerHTML='<div class="error-msg">Failed to load protocols: '+esc(e.message)+'</div>';
+  }
+}
+
+function applySearch(){
+  const grid=document.getElementById("protocol-grid");
+  if(!state.protocols) return;
+  const q=state.searchQuery.trim().toLowerCase();
+  const filtered=q
+    ? state.protocols.filter(p=>(p.name||"").toLowerCase().includes(q))
+    : state.protocols;
+  if(!filtered.length){
+    grid.innerHTML='<div class="empty-msg">No protocols match \u201c'+esc(state.searchQuery)+'\u201d</div>';
+    return;
+  }
+  drawProtocols(grid,filtered);
+}
+
+function drawProtocols(grid,protocols){
+  const rankMap=new Map();
+  if(state.protocols) state.protocols.forEach((p,i)=>rankMap.set(p.slug,i+1));
+
+  grid.innerHTML=protocols.map(p=>`
+    <div class="protocol-card" data-slug="${esc(p.slug)}">
+      <div class="card-header">
+        <img class="card-logo" src="${esc(p.logo)}" alt="" onerror="this.src='${FALLBACK_LOGO}'">
+        <span class="card-name">${esc(p.name)}</span>
+        <span class="card-rank">#${rankMap.get(p.slug)||""}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-tvl">${fmt(p.tvl)}</div>
+        <canvas class="card-sparkline" data-slug="${esc(p.slug)}"></canvas>
+        <div class="card-meta">
+          <span class="card-change ${pctClass(p.change_1d)}">${pct(p.change_1d)} 24h</span>
+          ${p.category?'<span class="badge">'+esc(p.category)+'</span>':""}
+          <span class="chain-pill">${(p.chains||[]).length} chains</span>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  grid.querySelectorAll(".protocol-card").forEach(card=>{
+    card.addEventListener("click",()=>openDetail(card.dataset.slug));
+  });
+
+  loadSparklines();
+}
+
+/* ==================================================================
+   SPARKLINES
+   ================================================================== */
+let _sparklineCache=null;
+
+async function loadSparklines(){
+  try{
+    if(!_sparklineCache) _sparklineCache=await api("/api/sparklines");
+    document.querySelectorAll(".card-sparkline").forEach(canvas=>{
+      const data=_sparklineCache[canvas.dataset.slug];
+      if(data&&data.length>=2){
+        drawSparkline(canvas,data);
+        canvas.classList.add("loaded");
+      }
+    });
+  }catch(e){/* sparklines are non-critical */}
+}
+
+function drawSparkline(canvas,values){
+  const dpr=window.devicePixelRatio||1;
+  const rect=canvas.getBoundingClientRect();
+  const w=rect.width||120,h=32;
+  canvas.width=w*dpr;canvas.height=h*dpr;
+  canvas.style.height=h+"px";
+  const ctx=canvas.getContext("2d");
+  ctx.scale(dpr,dpr);
+
+  const cs=getComputedStyle(document.documentElement);
+  const max=Math.max(...values),min=Math.min(...values),range=max-min||1;
+  const trend=values[values.length-1]-values[0];
+  const color=trend>=0
+    ?cs.getPropertyValue("--sparkline-green").trim()
+    :cs.getPropertyValue("--sparkline-red").trim();
+
+  function xp(i){return(i/(values.length-1))*w}
+  function yp(v){return h-2-((v-min)/range)*(h-4)}
+
+  ctx.beginPath();ctx.moveTo(xp(0),h);
+  values.forEach((v,i)=>ctx.lineTo(xp(i),yp(v)));
+  ctx.lineTo(w,h);ctx.closePath();
+  const grad=ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,`rgba(${color},0.18)`);
+  grad.addColorStop(1,`rgba(${color},0.02)`);
+  ctx.fillStyle=grad;ctx.fill();
+
+  ctx.beginPath();
+  values.forEach((v,i)=>{i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v))});
+  ctx.strokeStyle=`rgb(${color})`;ctx.lineWidth=1.5;ctx.stroke();
+}
+
+/* ==================================================================
+   TVL SUMMARY BAR
+   ================================================================== */
+async function renderTvlSummary(){
+  const el=document.getElementById("tvl-summary");
+  if(state.tvlHistory){drawTvlSummary(el,state.tvlHistory);return}
+  try{
+    const data=await api("/api/tvl-history");
+    state.tvlHistory=data;
+    drawTvlSummary(el,data);
+  }catch(e){
+    el.innerHTML='<div class="error-msg" style="padding:16px">Failed to load TVL data</div>';
+  }
+}
+
+function drawTvlSummary(el,data){
+  el.classList.remove("loading");
+  el.innerHTML=`
+    <div class="tvl-summary-stats">
+      <div class="tvl-summary-label">Total DeFi TVL</div>
+      <div class="tvl-summary-value">${fmt(data.tvl)}</div>
+      <div class="tvl-summary-change ${pctClass(data.change24h)}">${pct(data.change24h)} (24h)</div>
+    </div>
+    <div class="tvl-summary-chart">
+      <canvas id="tvl-summary-canvas" class="tvl-summary-canvas"></canvas>
+    </div>`;
+  drawTvlSummarySparkline();
+}
+
+function drawTvlSummarySparkline(){
+  if(!state.tvlHistory||!state.tvlHistory.points||state.tvlHistory.points.length<2) return;
+  const canvas=document.getElementById("tvl-summary-canvas");
+  if(!canvas) return;
+
+  const dpr=window.devicePixelRatio||1;
+  const rect=canvas.getBoundingClientRect();
+  const w=rect.width||300,h=48;
+  canvas.width=w*dpr;canvas.height=h*dpr;
+  canvas.style.height=h+"px";
+  const ctx=canvas.getContext("2d");
+  ctx.scale(dpr,dpr);
+
+  const values=state.tvlHistory.points;
+  const cs=getComputedStyle(document.documentElement);
+  const max=Math.max(...values),min=Math.min(...values),range=max-min||1;
+  const trend=values[values.length-1]-values[0];
+  const color=trend>=0
+    ?cs.getPropertyValue("--sparkline-green").trim()
+    :cs.getPropertyValue("--sparkline-red").trim();
+
+  function xp(i){return(i/(values.length-1))*w}
+  function yp(v){return h-3-((v-min)/range)*(h-6)}
+
+  // Gradient fill
+  ctx.beginPath();ctx.moveTo(xp(0),h);
+  values.forEach((v,i)=>ctx.lineTo(xp(i),yp(v)));
+  ctx.lineTo(w,h);ctx.closePath();
+  const grad=ctx.createLinearGradient(0,0,0,h);
+  grad.addColorStop(0,`rgba(${color},0.22)`);
+  grad.addColorStop(1,`rgba(${color},0.02)`);
+  ctx.fillStyle=grad;ctx.fill();
+
+  // Line stroke
+  ctx.beginPath();
+  values.forEach((v,i)=>{i===0?ctx.moveTo(xp(i),yp(v)):ctx.lineTo(xp(i),yp(v))});
+  ctx.strokeStyle=`rgb(${color})`;ctx.lineWidth=2;ctx.stroke();
+
+  canvas.classList.add("loaded");
+}
+
+/* ==================================================================
+   CHAINS TAB
+   ================================================================== */
+async function renderChains(){
+  const el=document.getElementById("chains-container");
+  if(state.chains){drawChains(el,state.chains);return}
+  el.innerHTML=skelRows(12);
+  try{
+    const data=await api("/api/chains");
+    state.chains=data;
+    drawChains(el,data);
+  }catch(e){
+    el.innerHTML='<div class="error-msg">Failed to load chains: '+esc(e.message)+'</div>';
+  }
+}
+
+function drawChains(el,chains){
+  const max=chains[0]?.tvl||1;
+  el.innerHTML=`
+    <div class="table-glass">
+    <table class="data-table">
+      <thead><tr>
+        <th>#</th><th>Chain</th><th>TVL</th><th>Token</th><th>Distribution</th>
+      </tr></thead>
+      <tbody>${chains.map((c,i)=>`
+        <tr>
+          <td>${i+1}</td>
+          <td style="font-weight:500">${esc(c.name)}</td>
+          <td style="font-weight:600">${fmt(c.tvl)}</td>
+          <td>${esc(c.tokenSymbol||"\u2014")}</td>
+          <td class="tvl-bar-cell"><div class="tvl-bar" style="width:${(c.tvl/max*100).toFixed(1)}%"></div></td>
+        </tr>`).join("")}
+      </tbody>
+    </table>
+    </div>`;
+}
+
+/* ==================================================================
+   YIELDS TAB
+   ================================================================== */
+async function renderYields(){
+  const el=document.getElementById("yields-container");
+  if(state.yields){drawYields(el,state.yields);return}
+  el.innerHTML=skelRows(12);
+  try{
+    const data=await api("/api/yields");
+    state.yields=data;
+    drawYields(el,data);
+  }catch(e){
+    el.innerHTML='<div class="error-msg">Failed to load yields: '+esc(e.message)+'</div>';
+  }
+}
+
+function drawYields(el,pools){
+  const sorted=[...pools].sort((a,b)=>{
+    let av=a[state.sortCol],bv=b[state.sortCol];
+    if(typeof av==="string") return state.sortDir==="asc"?av.localeCompare(bv):bv.localeCompare(av);
+    return state.sortDir==="asc"?(av||0)-(bv||0):(bv||0)-(av||0);
+  });
+
+  function hdr(label,col){
+    const arrow=state.sortCol===col?(state.sortDir==="asc"?" \u25B2":" \u25BC"):"";
+    return `<th class="sortable" data-sort="${col}">${label}<span class="sort-arrow">${arrow}</span></th>`;
+  }
+
+  el.innerHTML=`
+    <div class="table-glass">
+    <table class="data-table" id="yields-table">
+      <thead><tr>
+        ${hdr("Project","project")}
+        ${hdr("Pool","symbol")}
+        ${hdr("Chain","chain")}
+        ${hdr("APY","apy")}
+        ${hdr("Base","apyBase")}
+        ${hdr("Reward","apyReward")}
+        ${hdr("TVL","tvlUsd")}
+        <th>Type</th>
+      </tr></thead>
+      <tbody>${sorted.map(p=>`
+        <tr>
+          <td style="font-weight:500">${esc(p.project)}</td>
+          <td>${esc(p.symbol)}</td>
+          <td>${esc(p.chain)}</td>
+          <td class="apy-cell" style="color:${apyColor(p.apy)}">${p.apy!=null?p.apy.toFixed(2)+"%":"\u2014"}</td>
+          <td>${p.apyBase!=null?p.apyBase.toFixed(2)+"%":"\u2014"}</td>
+          <td>${p.apyReward!=null?p.apyReward.toFixed(2)+"%":"\u2014"}</td>
+          <td style="font-weight:600">${fmt(p.tvlUsd)}</td>
+          <td>${p.stablecoin?'<span class="stable-badge">Stable</span>':""}</td>
+        </tr>`).join("")}
+      </tbody>
+    </table>
+    </div>`;
+
+  el.querySelectorAll("th.sortable").forEach(th=>{
+    th.addEventListener("click",()=>{
+      const col=th.dataset.sort;
+      if(state.sortCol===col) state.sortDir=state.sortDir==="asc"?"desc":"asc";
+      else{state.sortCol=col;state.sortDir="desc"}
+      drawYields(el,pools);
+    });
+  });
+}
+
+/* ==================================================================
+   PROTOCOL DETAIL MODAL
+   ================================================================== */
+const modal=document.getElementById("detail-modal");
+const detailEl=document.getElementById("detail-content");
+
+document.getElementById("modal-close").addEventListener("click",closeModal);
+modal.addEventListener("click",e=>{if(e.target===modal)closeModal()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
+
+function closeModal(){modal.classList.remove("open")}
+
+async function openDetail(slug){
+  modal.classList.add("open");
+  detailEl.innerHTML=skelRows(6);
+  try{
+    const p=await api("/api/protocol/"+encodeURIComponent(slug));
+    drawDetail(p);
+  }catch(e){
+    detailEl.innerHTML='<div class="error-msg">Failed to load protocol: '+esc(e.message)+'</div>';
+  }
+}
+
+function drawDetail(p){
+  const chainTvls=p.currentChainTvls||{};
+  const tvlEntries=Object.entries(chainTvls)
+    .filter(([k])=>!k.includes("-"))
+    .sort((a,b)=>b[1]-a[1]);
+  const totalTvl=tvlEntries.reduce((s,e)=>s+e[1],0);
+
+  let tvlHistory=[];
+  if(Array.isArray(p.tvl)){
+    tvlHistory=p.tvl;
+  }else if(p.chainTvls){
+    for(const key of Object.keys(p.chainTvls)){
+      const v=p.chainTvls[key];
+      if(v&&Array.isArray(v.tvl)&&v.tvl.length>0){tvlHistory=v.tvl;break}
+    }
+  }
+
+  const ghLinks=(p.github||[]).map(repo=>
+    `<a class="detail-link" href="https://github.com/${esc(repo)}" target="_blank" rel="noopener">GitHub</a>`
+  ).join("");
+
+  detailEl.innerHTML=`
+    <div class="detail-header">
+      <img class="detail-logo" src="${esc(p.logo)}" alt="" onerror="this.src='${FALLBACK_LOGO}'">
+      <span class="detail-title">${esc(p.name)}</span>
+      ${p.category?'<span class="badge detail-category">'+esc(p.category)+'</span>':""}
+    </div>
+    ${p.description?'<p class="detail-desc">'+esc(p.description)+'</p>':""}
+    <div class="detail-stats">
+      <div class="stat-box"><div class="stat-label">Total TVL</div><div class="stat-value">${fmt(totalTvl)}</div></div>
+      <div class="stat-box"><div class="stat-label">Chains</div><div class="stat-value">${(p.chains||[]).length}</div></div>
+      <div class="stat-box"><div class="stat-label">Category</div><div class="stat-value" style="font-size:15px">${esc(p.category||"\u2014")}</div></div>
+    </div>
+    ${tvlHistory.length>0?`
+    <div class="chart-section">
+      <div class="chart-header">
+        <h3>TVL History</h3>
+        <div class="chart-range-btns">
+          <button class="range-btn active" data-range="all">ALL</button>
+          <button class="range-btn" data-range="365">1Y</button>
+          <button class="range-btn" data-range="90">90D</button>
+          <button class="range-btn" data-range="30">30D</button>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="tvl-canvas"></canvas>
+        <div id="chart-tooltip" class="chart-tooltip"></div>
+      </div>
+    </div>`:""}
+    ${tvlEntries.length>0?`
+    <div class="chain-breakdown">
+      <h3>TVL by Chain</h3>
+      ${tvlEntries.map(([chain,tvl])=>`
+        <div class="chain-row"><span>${esc(chain)}</span><span>${fmt(tvl)}</span></div>
+      `).join("")}
+    </div>`:""}
+    <div class="detail-links">
+      ${p.url?`<a class="detail-link" href="${esc(p.url)}" target="_blank" rel="noopener">Website</a>`:""}
+      ${p.twitter?`<a class="detail-link" href="https://x.com/${esc(p.twitter)}" target="_blank" rel="noopener">Twitter</a>`:""}
+      ${ghLinks}
+    </div>
+  `;
+
+  if(tvlHistory.length>0){
+    requestAnimationFrame(()=>{
+      const canvas=document.getElementById("tvl-canvas");
+      drawChart(canvas,tvlHistory);
+      setupRangeButtons(canvas,tvlHistory);
+    });
+  }
+}
+
+/* ==================================================================
+   ENHANCED CANVAS TVL CHART
+   ================================================================== */
+function drawChart(canvas,data){
+  if(!canvas||!data.length) return;
+  const dpr=window.devicePixelRatio||1;
+  const rect=canvas.getBoundingClientRect();
+  const H=200;
+  canvas.width=rect.width*dpr;canvas.height=H*dpr;
+  canvas.style.height=H+"px";
+  const ctx=canvas.getContext("2d");
+  ctx.scale(dpr,dpr);
+  const W=rect.width;
+  const P={top:16,right:10,bottom:28,left:52};
+  const cW=W-P.left-P.right,cH=H-P.top-P.bottom;
+
+  const cs=getComputedStyle(document.documentElement);
+  const values=data.map(d=>d.totalLiquidityUSD);
+  const timestamps=data.map(d=>d.date);
+  const max=Math.max(...values),min=Math.min(...values),range=max-min||1;
+
+  function cx(i){return P.left+(i/(values.length-1))*cW}
+  function cy(v){return P.top+cH-((v-min)/range)*cH}
+
+  // Y-axis grid lines
+  const gridN=5;
+  ctx.strokeStyle=cs.getPropertyValue("--chart-grid").trim();ctx.lineWidth=1;
+  for(let i=0;i<=gridN;i++){
+    const gy=P.top+(cH/gridN)*i;
+    ctx.beginPath();ctx.moveTo(P.left,gy);ctx.lineTo(P.left+cW,gy);ctx.stroke();
+    const val=max-(range/gridN)*i;
+    ctx.fillStyle=cs.getPropertyValue("--chart-label").trim();ctx.font="10px Inter, sans-serif";ctx.textAlign="right";
+    ctx.fillText(fmt(val),P.left-6,gy+3);
+  }
+
+  // gradient fill
+  ctx.beginPath();ctx.moveTo(cx(0),P.top+cH);
+  values.forEach((v,i)=>ctx.lineTo(cx(i),cy(v)));
+  ctx.lineTo(cx(values.length-1),P.top+cH);ctx.closePath();
+  const grad=ctx.createLinearGradient(0,P.top,0,H);
+  grad.addColorStop(0,cs.getPropertyValue("--chart-fill-start").trim());
+  grad.addColorStop(1,cs.getPropertyValue("--chart-fill-end").trim());
+  ctx.fillStyle=grad;ctx.fill();
+
+  // line
+  ctx.beginPath();
+  values.forEach((v,i)=>{i===0?ctx.moveTo(cx(i),cy(v)):ctx.lineTo(cx(i),cy(v))});
+  ctx.strokeStyle=cs.getPropertyValue("--chart-stroke").trim();ctx.lineWidth=2;ctx.stroke();
+
+  // X-axis time labels
+  ctx.fillStyle=cs.getPropertyValue("--chart-label").trim();ctx.font="10px Inter, sans-serif";ctx.textAlign="center";
+  const labelN=Math.min(5,Math.floor(cW/90));
+  for(let i=0;i<=labelN;i++){
+    const idx=Math.floor((i/labelN)*(timestamps.length-1));
+    const d=new Date(timestamps[idx]*1000);
+    ctx.fillText(d.toLocaleDateString("en",{month:"short",day:"numeric"}),cx(idx),H-6);
+  }
+
+  // Cache base image for hover overlay
+  canvas._base=ctx.getImageData(0,0,canvas.width,canvas.height);
+  canvas._cx=cx;canvas._cy=cy;canvas._values=values;canvas._ts=timestamps;canvas._P=P;canvas._W=W;canvas._H=H;canvas._cW=cW;
+
+  if(!canvas._hoverBound){
+    canvas._hoverBound=true;
+    const tooltip=document.getElementById("chart-tooltip");
+
+    canvas.addEventListener("mousemove",e=>{
+      const r=canvas.getBoundingClientRect();
+      const mx=e.clientX-r.left,my=e.clientY-r.top;
+      const {_P:pp,_W:ww,_H:hh,_cx:ccx,_cy:ccy,_values:vv,_ts:tt,_cW:ccW,_base:base}=canvas;
+      if(!base||mx<pp.left||mx>ww-pp.right||my<pp.top||my>hh-pp.bottom){
+        tooltip.classList.remove("visible");return;
+      }
+      const idx=Math.round(((mx-pp.left)/ccW)*(vv.length-1));
+      const ci=Math.max(0,Math.min(vv.length-1,idx));
+      const px=ccx(ci),py=ccy(vv[ci]);
+
+      const dpr2=window.devicePixelRatio||1;
+      const ctx2=canvas.getContext("2d");
+      ctx2.putImageData(base,0,0);
+      ctx2.save();ctx2.scale(dpr2,dpr2);
+
+      const cs2=getComputedStyle(document.documentElement);
+
+      // Crosshair
+      ctx2.setLineDash([4,4]);ctx2.strokeStyle=cs2.getPropertyValue("--chart-crosshair").trim();ctx2.lineWidth=1;
+      ctx2.beginPath();ctx2.moveTo(px,pp.top);ctx2.lineTo(px,hh-pp.bottom);ctx2.stroke();
+      ctx2.beginPath();ctx2.moveTo(pp.left,py);ctx2.lineTo(ww-pp.right,py);ctx2.stroke();
+      ctx2.setLineDash([]);
+
+      // Dot
+      ctx2.beginPath();ctx2.arc(px,py,5,0,Math.PI*2);
+      ctx2.fillStyle=cs2.getPropertyValue("--chart-stroke").trim();ctx2.fill();
+      ctx2.strokeStyle=cs2.getPropertyValue("--chart-dot-stroke").trim();ctx2.lineWidth=2;ctx2.stroke();
+      ctx2.restore();
+
+      // Tooltip
+      const date=new Date(tt[ci]*1000);
+      tooltip.innerHTML='<div class="tooltip-date">'+date.toLocaleDateString("en",{month:"short",day:"numeric",year:"numeric"})+'</div><div class="tooltip-value">'+fmt(vv[ci])+'</div>';
+      const tx=mx+15>canvas.offsetWidth-120?mx-130:mx+15;
+      tooltip.style.left=tx+"px";tooltip.style.top=(my-10)+"px";
+      tooltip.classList.add("visible");
+    });
+
+    canvas.addEventListener("mouseleave",()=>{
+      tooltip.classList.remove("visible");
+      if(canvas._base){
+        const ctx2=canvas.getContext("2d");
+        ctx2.putImageData(canvas._base,0,0);
+      }
+    });
+  }
+}
+
+function setupRangeButtons(canvas,fullData){
+  document.querySelectorAll(".range-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll(".range-btn").forEach(b=>b.classList.remove("active"));
+      btn.classList.add("active");
+      const r=btn.dataset.range;
+      let filtered=fullData;
+      if(r!=="all"){
+        const cutoff=Date.now()/1000-(parseInt(r)*86400);
+        filtered=fullData.filter(d=>d.date>=cutoff);
+        if(filtered.length<2) filtered=fullData;
+      }
+      drawChart(canvas,filtered);
+    });
+  });
+}
+
+/* ==================================================================
+   TAB NAVIGATION
+   ================================================================== */
+const renderers={protocols:renderProtocols,chains:renderChains,yields:renderYields};
+
+document.querySelectorAll(".tab-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    const tab=btn.dataset.tab;
+    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById(tab+"-tab").classList.add("active");
+    if(!state.loaded[tab]){state.loaded[tab]=true;renderers[tab]()}
+  });
+});
+
+/* ==================================================================
+   LOGO HOME BUTTON
+   ================================================================== */
+document.getElementById("logo-home").addEventListener("click", e => {
+  e.preventDefault();
+  // Switch to Protocols tab
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+  document.querySelector('[data-tab="protocols"]').classList.add("active");
+  document.getElementById("protocols-tab").classList.add("active");
+  if (!state.loaded.protocols) { state.loaded.protocols = true; renderProtocols(); }
+  // Close modal if open
+  closeModal();
+  // Clear search
+  state.searchQuery = "";
+  searchInput.value = "";
+  searchClear.classList.add("hidden");
+  applySearch();
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+/* ==================================================================
+   SEARCH
+   ================================================================== */
+const searchInput=document.getElementById("protocol-search");
+const searchClear=document.getElementById("search-clear");
+searchInput.addEventListener("input",()=>{
+  state.searchQuery=searchInput.value;
+  searchClear.classList.toggle("hidden",!searchInput.value);
+  applySearch();
+});
+searchClear.addEventListener("click",()=>{
+  state.searchQuery="";searchInput.value="";
+  searchClear.classList.add("hidden");
+  applySearch();searchInput.focus();
+});
+
+/* ==================================================================
+   INIT
+   ================================================================== */
+state.loaded.protocols=true;
+renderProtocols();
+
+})();
+</script>
+</body>
+</html>
