@@ -19,6 +19,10 @@ A real-time DeFi analytics dashboard powered by the [DefiLlama API](https://defi
 ## Getting Started
 
 ```bash
+# macOS
+python3 server.py
+
+# Linux / Windows
 python server.py
 ```
 
